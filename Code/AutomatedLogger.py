@@ -5,10 +5,11 @@ import time
 import copy
 import string
 #from AtlasI2C import (AtlasI2C)
-from Media_Scanner import *
-from Util import *
+#from Media_Scanner import *
+#from Util import *
 #from database import *
 #from log import *
+from New_USB_Writer import *
 
 #function obtains an array of all Atlas scientific devices connected to the I2C bus
 def get_devices():
@@ -54,7 +55,6 @@ def dummy():
     return ["Success DO ---------- 10.2","Success PTD ---------- 20000"]
 
 def main():
-    ms = MediaScanner()
     
     dataRaw = []
     for i in range(10):
@@ -63,13 +63,7 @@ def main():
         dataRaw.append([time.ctime(), dummy()[1].split(" ")[1], dummy()[1].split(" ")[3]])
     
     
-    Drives = ms.scan_media()
-    
-    if Drives:
-        for Drive in Drives:
-            mount_partition(get_partition(Drives))
-            write_and_verify('/media/mymntpnt/test_Write',dataRaw)
-            unmount_partition()
+    Write_USB(dataRaw)
     
     print(dataRaw)
     
