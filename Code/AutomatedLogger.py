@@ -5,10 +5,6 @@ import time
 import copy
 import string
 #from AtlasI2C import (AtlasI2C)
-#from Media_Scanner import *
-#from Util import *
-#from database import *
-#from log import *
 from New_USB_Writer import *
 
 #function obtains an array of all Atlas scientific devices connected to the I2C bus

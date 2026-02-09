@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 
-MOUNT_BASE = "/media/pi"
+MOUNT_BASE = "/media/joab"
 CHECK_INTERVAL = 2  # seconds
 
 def find_usb_mount():
@@ -20,6 +20,7 @@ def find_usb_mount():
 def Write_USB(data):
     mount = find_usb_mount()
     current_mount = None
+    file_handle = None
 
     # USB inserted
     if mount and mount != current_mount:
@@ -27,7 +28,9 @@ def Write_USB(data):
         current_mount = mount
 
         try:
-            file_path = os.path.join(current_mount, "data_log.txt")
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"data_{timestamp}.txt"
+            file_path = os.path.join(current_mount, filename)
             file_handle = open(file_path, "a", buffering=1)
         except Exception as e:
             print("Failed to open file:", e)
