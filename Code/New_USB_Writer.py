@@ -19,6 +19,7 @@ def find_usb_mount():
 
 def Write_USB(data):
     mount = find_usb_mount()
+    current_mount = None
 
     # USB inserted
     if mount and mount != current_mount:

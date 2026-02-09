@@ -56,11 +56,14 @@ def dummy():
 
 def main():
     
-    dataRaw = []
+    dataRaw = ""
     for i in range(10):
         print(i)
-        dataRaw.append([time.ctime(), dummy()[0].split(" ")[1], dummy()[0].split(" ")[3]])
-        dataRaw.append([time.ctime(), dummy()[1].split(" ")[1], dummy()[1].split(" ")[3]])
+        
+        temp = dummy()
+        
+        dataRaw += time.ctime() + temp[0].split(" ")[1] + temp[0].split(" ")[3] + '\n'
+        dataRaw += time.ctime() + temp[1].split(" ")[1] + temp[1].split(" ")[3] + '\n'
     
     
     Write_USB(dataRaw)
