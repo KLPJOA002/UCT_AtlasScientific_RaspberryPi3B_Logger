@@ -1,10 +1,10 @@
 import io
 import sys
-#import fcntl
+import fcntl
 import time
 import copy
 import string
-#from AtlasI2C import (AtlasI2C)
+from AtlasI2C import (AtlasI2C)
 from New_USB_Writer import *
 
 #function obtains an array of all Atlas scientific devices connected to the I2C bus
@@ -26,6 +26,25 @@ def get_devices():
         device_list.append(AtlasI2C(address = i, moduletype = moduletype, name = response))
     return device_list 
 
+def wake():
+    device_list = get_devices()
+    
+    if device_list:
+        delaytime = 0.6 #reads require 600ms delay before getting data.
+
+        for dev in device_list: #any command but read to wake the reader
+            dev.write("i")    
+        time.sleep(delaytime) 
+        
+def SendSleep():
+    device_list = get_devices()
+    
+    if device_list:
+        delaytime = 0.6 #reads require 600ms delay before getting data.
+        for dev in device_list:# put reader to sleep
+            dev.write("Sleep")
+    
+        
 def read():
     #get array of connected devices using i2c.py library
     Out = []
@@ -34,18 +53,15 @@ def read():
     if device_list:
         #get the first device in the list to be used to get the time delays required.
         DeviceTemplate = device_list[0]
-        delaytime = 0.6 #reads require 600ms delay before getting data.
-
-        for dev in device_list:
-            dev.write("i")
-        for dev in device_list:
+        delaytime = 0.6 #reads require 600ms delay before getting data.   
+            
+        for dev in device_list: #issue read command and read the result
             dev.write("R")
+            
         time.sleep(delaytime)
         for dev in device_list:
             Out.append(dev.read())
         
-        for dev in device_list:
-            dev.write("Sleep")
         
     return Out
     
@@ -66,6 +82,8 @@ def main():
     
     AverageString = None
     dataRaw = None
+    
+    wake()
     
     #get 10 readings per sample
     for i in range(10):
@@ -119,6 +137,8 @@ def main():
             '''
     Averages = [x/10 for x in Averages]
     
+    SendSleep()
+    
     for j in range(0,len(temp),2):
                 
         AverageString[j] += f"Average,{temp[j].split(":")[0]},{Averages[j]}\n"
@@ -129,11 +149,11 @@ def main():
         
     for j in range(0,len(temp),2):
         if int(temp[0].split(" ")[2]) == 97:
-            Write_USB(dataRaw,"Sensor 1")
+            Write_USB(dataRaw[j],"Sensor_1")
             #print("Device 1")
             #print(dataRaw[j])
         else:
-            Write_USB(dataRaw,"Sensor 2")
+            Write_USB(dataRaw[j],"Sensor_2")
             #print("Device 2")
             #print(dataRaw[j])
     

@@ -20,9 +20,12 @@ sudo hwclock -w
 echo "System time updated to $USER_DATETIME"
 
 # Force sync mount options for ALL USB mass storage devices on insertion
-sudo bash -c 'cat > /etc/udev/rules.d/99-usb-sync-mount.rules << EOF
+sudo bash -c 'cat > /etc/udev/rules.d/99-usb-automount.rules << EOF
 ACTION=="add", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", \
-    ENV{UDISKS_MOUNT_OPTIONS_DEFAULTS}="sync,noatime"
+    ENV{UDISKS_MOUNT_OPTIONS_DEFAULTS}="sync,noatime", \
+    RUN+="/bin/bash -c '\''udisksctl mount --block-device %N --no-user-interaction'\''"
+ACTION=="remove", SUBSYSTEMS=="usb", SUBSYSTEM=="block", \
+    RUN+="/bin/bash -c '\''udisksctl unmount --block-device %N --no-user-interaction 2>/dev/null || true'\''"
 EOF'
 
 sudo udevadm control --reload-rules
@@ -33,8 +36,8 @@ echo "Setup complete. All USB drives will now be mounted with sync."
 echo "Enabling I2C"
 sudo raspi-config nonint do_i2c 0
 
-#echo "Disabling Desktop by switching to console mode"
-#sudo systemctl set-default multi-user.target
+echo "Disabling Desktop by switching to console mode"
+sudo systemctl set-default multi-user.target
 
 echo "Adding system service to run logger"
 sudo tee /etc/systemd/system/logger.service > /dev/null << EOF
@@ -45,7 +48,7 @@ After=multi-user.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 $SCRIPT_DIR/logger.py
-User=pi
+User=root
 WorkingDirectory=$SCRIPT_DIR
 EOF
 
