@@ -29,7 +29,7 @@ def Write_USB(data):
 
         try:
             timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            filename = f"data_{timestamp}.txt"
+            filename = f"data_{timestamp}.csv"
             file_path = os.path.join(current_mount, filename)
             file_handle = open(file_path, "a", buffering=1)
         except Exception as e:
@@ -48,6 +48,8 @@ def Write_USB(data):
     if file_handle:
         try:
             file_handle.write(data)
+            file_handle.flush()                   # Flush Python buffer
+            os.fsync(file_handle.fileno())        # Force OS to write to disk
         except Exception as e:
             print("Write failed:", e)
             file_handle.close()

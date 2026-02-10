@@ -1,10 +1,10 @@
 import io
 import sys
-#import fcntl
+import fcntl
 import time
 import copy
 import string
-#from AtlasI2C import (AtlasI2C)
+from AtlasI2C import (AtlasI2C)
 from New_USB_Writer import *
 
 #function obtains an array of all Atlas scientific devices connected to the I2C bus
@@ -56,15 +56,16 @@ def main():
     for i in range(10):
         print(i)
         
-        temp = dummy()
+        #temp = dummy()
+        temp = read()
         
-        dataRaw += time.ctime() + temp[0].split(" ")[1] + temp[0].split(" ")[3] + '\n'
-        dataRaw += time.ctime() + temp[1].split(" ")[1] + temp[1].split(" ")[3] + '\n'
+        dataRaw += f"{time.ctime()},{temp[0].split(" ")[1]},{temp[0].split(" ")[3]}\n"
+        dataRaw += f"{time.ctime()},{temp[1].split(" ")[1]},{temp[1].split(" ")[3]}\n"
     
     
     Write_USB(dataRaw)
     
-    print(dataRaw)
+    #print(dataRaw)
     
     
     
