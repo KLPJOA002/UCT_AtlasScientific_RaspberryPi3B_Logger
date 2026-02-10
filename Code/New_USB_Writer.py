@@ -18,7 +18,7 @@ def find_usb_mount():
 
     return None
 
-def Write_USB(data):
+def Write_USB(data,Name_Modifier):
     mount = find_usb_mount()
 
     # USB inserted
@@ -45,8 +45,8 @@ def Write_USB(data):
     # Write data if USB is present
     try:
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"data_{timestamp}.csv"
-        file_path = os.path.join(current_mount, filename)
+        filename = f"data_{Name_Modifier}_{timestamp}.csv"
+        file_path = os.path.join(mount, filename)
         with open(file_path, "a", buffering=1) as fh:
         
             fh.write(data)

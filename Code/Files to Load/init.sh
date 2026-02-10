@@ -19,6 +19,17 @@ sudo hwclock -w
 
 echo "System time updated to $USER_DATETIME"
 
+# Force sync mount options for ALL USB mass storage devices on insertion
+sudo bash -c 'cat > /etc/udev/rules.d/99-usb-sync-mount.rules << EOF
+ACTION=="add", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", \
+    ENV{UDISKS_MOUNT_OPTIONS_DEFAULTS}="sync,noatime"
+EOF'
+
+sudo udevadm control --reload-rules
+sudo systemctl restart udisks2
+
+echo "Setup complete. All USB drives will now be mounted with sync."
+
 echo "Enabling I2C"
 sudo raspi-config nonint do_i2c 0
 
