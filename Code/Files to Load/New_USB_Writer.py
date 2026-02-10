@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 
-MOUNT_BASE = "/media/joab"
+MOUNT_BASE = "/media/pi"
 CHECK_INTERVAL = 2  # seconds
 
 def find_usb_mount():

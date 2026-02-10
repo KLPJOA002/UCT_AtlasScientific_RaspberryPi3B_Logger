@@ -1,8 +1,29 @@
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Ask user for date and time
+echo "Enter current date and time (format: YYYY-MM-DD HH:MM:SS)"
+read USER_DATETIME
+
+# Validate basic format (optional, simple regex)
+if [[ ! $USER_DATETIME =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
+    echo "Invalid format. Please use YYYY-MM-DD HH:MM:SS"
+    exit 1
+fi
+
+# Set the system date and time
+sudo date -s "$USER_DATETIME"
+
+# Optional: update hardware clock to persist after reboot
+sudo hwclock -w
+
+echo "System time updated to $USER_DATETIME"
+
 echo "Enabling I2C"
 sudo raspi-config nonint do_i2c 0
+
+#echo "Disabling Desktop by switching to console mode"
+#sudo systemctl set-default multi-user.target
 
 echo "Adding system service to run logger"
 sudo tee /etc/systemd/system/logger.service > /dev/null << EOF
@@ -23,7 +44,7 @@ sudo tee /etc/systemd/system/logger.timer > /dev/null << EOF
 Description=Run data logger every minute
 
 [Timer]
-OnBootSec=30
+OnBootSec=10
 OnUnitActiveSec=60
 AccuracySec=1s
 Persistent=true
