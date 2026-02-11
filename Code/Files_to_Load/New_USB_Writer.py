@@ -4,10 +4,10 @@ from datetime import datetime
 import subprocess
 import re
 
-MOUNT_BASE = "/media/pi"
+MOUNT_BASE = "/media/usb"
 CHECK_INTERVAL = 2  # seconds
 
-
+'''
 def find_usb_mount():
     """Return path to first mounted USB drive, or None."""
     if not os.path.exists(MOUNT_BASE):
@@ -19,7 +19,7 @@ def find_usb_mount():
             return path
 
     return None
-
+'''
 
 
 '''
@@ -40,7 +40,6 @@ def find_usb_mount():
             if any(mountpoint.startswith(base) for base in usb_bases):
                 return mountpoint
     return None
-'''
 '''
 def find_usb_mount():
     """
@@ -65,7 +64,7 @@ def find_usb_mount():
     except Exception as e:
         print(f"Error reading /proc/mounts: {e}")
     return None
-'''
+
 def Write_USB(data,Name_Modifier):
     mount = find_usb_mount()
 

@@ -1,11 +1,23 @@
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "installing required packages"
-sudo apt install util-linux-extra
+# Ask user for date and time
+echo "Enter current date and time (format: YYYY-MM-DD HH:MM:SS)"
+read USER_DATETIME
 
-echo "dtoverlay=i2c-rtc,ds3231" | sudo tee -a /boot/firmware/config.txt
-echo "Added DS3231 driver for RTC"
+# Validate basic format (optional, simple regex)
+if [[ ! $USER_DATETIME =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
+    echo "Invalid format. Please use YYYY-MM-DD HH:MM:SS"
+    exit 1
+fi
+
+# Set the system date and time
+sudo date -s "$USER_DATETIME"
+
+# Optional: update hardware clock to persist after reboot
+sudo hwclock -w
+
+echo "System time updated to $USER_DATETIME"
 
 # Force sync mount options for USB mass storage via udev
 #sudo bash -c 'cat > /etc/udev/rules.d/99-usb-sync-mount.rules << EOF
@@ -106,7 +118,7 @@ Description=Run data logger every minute
 After=local-fs.target sysinit.target
 
 [Timer]
-OnBootSec=60
+OnBootSec=30
 OnUnitActiveSec=60
 AccuracySec=1s
 Persistent=true

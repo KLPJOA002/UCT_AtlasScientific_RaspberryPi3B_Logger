@@ -6,7 +6,6 @@ import copy
 import string
 from AtlasI2C import (AtlasI2C)
 from New_USB_Writer import *
-import RPi.GPIO as GPIO
 
 #function obtains an array of all Atlas scientific devices connected to the I2C bus
 #source: Atlas Scientific EZO python Library
@@ -75,10 +74,6 @@ def dummy():
             #,"Success DO 98 : 10.2","Success RTD 103 : 100"]
 
 def main():
-    
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(7,GPIO.OUT)
-    GPIO.output(7,1)
     
     #average of the 10 readings per sample
     average_DO = float
@@ -161,9 +156,6 @@ def main():
             Write_USB(dataRaw[j],"Sensor_2")
             #print("Device 2")
             #print(dataRaw[j])
-    
-    GPIO.output(7,0)
-    GPIO.cleanup()
     
     #print(dataRaw)
     
