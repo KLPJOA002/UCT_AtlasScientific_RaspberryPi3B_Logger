@@ -2,8 +2,9 @@ import os
 import time
 from datetime import datetime
 import subprocess
+import re
 
-MOUNT_BASE = "/media/pi"
+MOUNT_BASE = "/media/usb"
 CHECK_INTERVAL = 2  # seconds
 
 '''
@@ -19,8 +20,9 @@ def find_usb_mount():
 
     return None
 '''
-import re
 
+
+'''
 def find_usb_mount():
     usb_bases = ["/media/pi", "/media/root", "/media"]
     with open("/proc/mounts", "r") as f:
@@ -38,7 +40,30 @@ def find_usb_mount():
             if any(mountpoint.startswith(base) for base in usb_bases):
                 return mountpoint
     return None
-
+'''
+def find_usb_mount():
+    """
+    Parse /proc/mounts and return the first mountpoint under MOUNT_BASE.
+    Works in both console and desktop mode, no D-Bus required.
+    """
+    try:
+        with open("/proc/mounts", "r") as f:
+            for line in f:
+                parts = line.split()
+                if len(parts) < 2:
+                    continue
+                mountpoint = parts[1]
+                # Decode octal escape sequences (e.g. \040 -> space)
+                mountpoint = re.sub(
+                    r'\\0([0-7]{2})',
+                    lambda m: chr(int(m.group(1), 8)),
+                    mountpoint
+                )
+                if mountpoint.startswith(MOUNT_BASE):
+                    return mountpoint
+    except Exception as e:
+        print(f"Error reading /proc/mounts: {e}")
+    return None
 
 def Write_USB(data,Name_Modifier):
     mount = find_usb_mount()
