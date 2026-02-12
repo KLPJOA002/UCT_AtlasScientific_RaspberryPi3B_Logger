@@ -1,3 +1,8 @@
+# Python code written for the purpose of reading I2C data from an Atlas Scientific i4 InterLink board connected to two Industrial DO and RTD Sensors
+# Written for the University of Cape Town Research Group
+# Written by Joab Gray Kloppers: KLPJOA002
+# Disclaimer: Parts of this code were created with the use of AI tools including: ChatGPT, ClaudeAi
+
 import io
 import sys
 import fcntl
@@ -30,8 +35,7 @@ def get_devices():
     
     Device_Addresses = []
     
-    #ReturnList = []
-    
+    #get the addresses of each sensor, grouped and ordered by sensor.
     for i in device_address_list:
         if i in Sensor1_Addresses:
             Device1_Address.append(i)
@@ -41,7 +45,7 @@ def get_devices():
     Device_Addresses = Device1_Address+Device2_Address
     
     
-    
+    #get the full device for each sensor, grouped and ordered by sensor.
     for i in device_address_list:
         device.set_i2c_address(i)
         response = device.query("I")
@@ -61,44 +65,36 @@ def get_devices():
     return device_list,Device_Addresses
 
 def wake(device_list):
-    #device_list,ignore = get_devices()
-    
+    #Wake the devices in the given list
     if device_list:
 
         for dev in device_list: #any command but read to wake the reader
             dev.write("i")    
-        time.sleep(delaytime) 
+        time.sleep(delaytime) #wait for some time to prevent pottential issues with following commands
         
 def SendSleep(device_list):
-    #device_list,ignore = get_devices()
+    #send the devices in the given list to sleep
     
     if device_list:
-        #delaytime = 0.6 #reads require 600ms delay before getting data.
-        for dev in device_list:# put reader to sleep
+        for dev in device_list:# put module to sleep
             dev.write("Sleep")
     
         
 def read(device_list):
-    #get array of connected devices using i2c.py library
+    #get array of the sensor data using the given device list
     Out = []
-    #device_list,device_addresses= get_devices()
     
-    
-    if device_list:
-        #get the first device in the list to be used to get the time delays required.
-        #DeviceTemplate = device_list[0] 
-            
+    if device_list: 
         for dev in device_list: #issue read command and read the result
             dev.write("R")
             
-        time.sleep(delaytime)
+        time.sleep(delaytime) #after the delay required for sensor to process command and send data, read the data.
         for dev in device_list:
             Out.append(dev.read())
-        
-        
-    return Out#,device_addresses
+            
+    return Out
     
-#dummy function to test just values
+#dummy function to test just values. Ignore
 def dummy():
     
     device_address_list = [97,98,102,103]
@@ -113,7 +109,6 @@ def dummy():
     
     Atlas_Devices = []
     
-    #ReturnList = []
     
     for i in device_address_list:
         if i in Sensor1_Addresses:
@@ -123,7 +118,6 @@ def dummy():
         
     Atlas_Devices = Device1_Address+Device2_Address
     
-    #ReturnList = []
     
     for i in device_address_list:
         if i in Sensor1_Addresses:
@@ -140,18 +134,7 @@ def dummy():
 
 def main():
     
-    #GPIO.setmode(GPIO.BOARD)
-    #GPIO.setup(7,GPIO.OUT)
-    #GPIO.output(7,1)
-    
-    #average of the 10 readings per sample
-    #average_DO = float
-    #average_RTD = float
-    #Averages = None
-    
-    #AverageString = None
-    #dataRaw = None
-    
+    #initilise Variables
     dataRaw_Sensor1 = ""
     dataRaw_Sensor2 = ""
     
@@ -161,12 +144,13 @@ def main():
     AverageString_Sensor1 = ""
     AverageString_Sensor2 = ""
     
-    
-    
+    #Get a list of Atlas Scientific devices and a list of the addresses. 
     Device_list, Device_Addresses = get_devices()
     
+    #wake up the Sensor modules
     wake(Device_list)
     
+    #Group the sensors based on the pre-defines sensor addresses.
     Device1 = []
     Device2 = []
     for i in range(len(Device_list)):
@@ -177,15 +161,11 @@ def main():
     
     #get 10 readings per sample
     for i in range(Num_samples_per_measurement):
+        
         print(i)
+        read_data = read(Device_list) #read the data from the devices in device list
         
-        #read_data,Device_Addresses = dummy()
-        #print(read_data)
-        #read from connected devies.
-        read_data = read(Device_list)
-        
-        #average_DO += read_data[0].split(":")[1]
-        
+        #varible initilisation
         if Average_Sensor1 is None:
             Average_Sensor1 = [0.0]*len(Device1)
             
@@ -195,24 +175,12 @@ def main():
         Count1=0
         Count2=0
         
-        '''
-        if Averages is None:
-            Averages = [0.0]*len(read_data)
-        
-        if dataRaw is None:
-            dataRaw = [""]*len(read_data)
-            
-        if AverageString is None:
-            AverageString = [""]*len(read_data)
-        
-        '''
         if not read_data:
-            dataRaw += "Unsuccessful Read\n"
+            dataRaw += "Unsuccessful Read\n" #check if there was a failed read
         
         else:
             
-            for j in range(len(read_data)):
-                #print(read_data[j])
+            for j in range(len(read_data)): #using the read data, orgagnize into lists of raw data for each sensor, and get average for all parameters for each sensor.
                 
                 if Device_Addresses[j] in Sensor1_Addresses:
                     read_data[j] = read_data[j].rstrip('\x00') #remove empty byte values at end of reading
@@ -225,62 +193,13 @@ def main():
                     dataRaw_Sensor2 += f"{time.strftime("%Y-%M-%d %H:%M:%S",time.localtime())},{read_data[j].split(":")[0].rstrip('\x00')},{read_data[j].split(":")[1]}\n"
                     Average_Sensor2[Count2] += float(read_data[j].split(":")[1])
                     Count2 += 1
-                    
-            '''Below works
-            for j in range(0,len(read_data),2):
-                
-                read_data[j] = read_data[j].rstrip('\x00') #remove empty byte values at end of reading
-                read_data[j+1] = read_data[j+1].rstrip('\x00') #remove empty byte values at end of reading
-                
-                dataRaw[j] += f"{time.ctime()},{read_data[j].split(":")[0].rstrip('\x00')},{read_data[j].split(":")[1]}\n"
-                Averages[j] += float(read_data[j].split(":")[1])
-                
-                dataRaw[j] += f"{time.ctime()},{read_data[j+1].split(":")[0].rstrip('\x00')},{read_data[j+1].split(":")[1]}\n"
-                Averages[j+1] += float(read_data[j+1].split(":")[1])
-            
-            '''
-            '''
-            average_DO += read_data[0].split(":")[1]
-            average_RTD += read_data[1].split(":")[1]
-            
-            dataRaw += f"{time.ctime()},{read_data[0].split(":")[0]},{read_data[0].split(":")[1]}\n"
-            dataRaw += f"{time.ctime()},{read_data[1].split(":")[0]},{read_data[1].split(":")[1]}\n"
-            
-            
-        elif read_data[0].split(" ")[1] == "RTD":
-            
-            average_DO += read_data[1].split(":")[1]
-            average_RTD += read_data[0].split(":")[1]
-            
-            dataRaw += f"{time.ctime()},{read_data[1].split(":")[0]},{read_data[0].split(":")[1]}\n"
-            dataRaw += f"{time.ctime()},{read_data[0].split(":")[0]},{read_data[1].split(":")[1]}\n"
-            '''
-    Average_Sensor1 = [x/Num_samples_per_measurement for x in Average_Sensor1]
+
+    Average_Sensor1 = [x/Num_samples_per_measurement for x in Average_Sensor1] #Compute the average of the raw data
     Average_Sensor2 = [x/Num_samples_per_measurement for x in Average_Sensor2]
     
-    SendSleep(Device_list)
+    SendSleep(Device_list) #send sensor devies to sleep
     
-    '''
-    for j in range(0,len(read_data),2):
-                
-        AverageString[j] += f"Average,{read_data[j].split(":")[0].rstrip('\x00')},{Averages[j]}\n"
-        AverageString[j] += f"Average,{read_data[j+1].split(":")[0].rstrip('\x00')},{Averages[j+1]}\n"
-    
-    for j in range(0,len(read_data),2):
-        dataRaw[j]+=AverageString[j] + AverageString[j+1]
-        
-    for j in range(0,len(read_data),2):
-        if int(read_data[0].split(" ")[2]) == 97:
-            #Write_USB(dataRaw[j],"Sensor_1")
-            print("Device 1")
-            print(dataRaw[j])
-        else:
-            #Write_USB(dataRaw[j],"Sensor_2")
-            print("Device 2")
-            print(dataRaw[j])
-            
-    '''
-        
+    #Add the average to the raw data for file writing    
     for i in range(len(Device1)):
         AverageString_Sensor1 += f"Average,{Device1[i].split(":")[0].rstrip('\x00')},{Average_Sensor1[i]}\n"
         
@@ -290,19 +209,12 @@ def main():
     dataRaw_Sensor1+=AverageString_Sensor1
     dataRaw_Sensor2+=AverageString_Sensor2
     
+    #write the relavent data to the corresponding file. e.g. if sensor 1 presemt, write sensor 1 data to file labeled sensor 1
     if Device1:
         Write_USB(dataRaw_Sensor1,"Sensor_1")
         
     if Device2:
-        Write_USB(dataRaw_Sensor2,"Sensor_2")
-
-    
-    #GPIO.output(7,0)
-    #GPIO.cleanup()
-    
-    #print(dataRaw)
-    
-    
+        Write_USB(dataRaw_Sensor2,"Sensor_2")    
     
 if __name__=='__main__':
     main()

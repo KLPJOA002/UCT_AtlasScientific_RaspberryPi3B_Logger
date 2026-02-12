@@ -1,4 +1,5 @@
-#!/usr/bin/python
+# Python code provided by Atlas Scientific to interface with Atlas Scientific sensors
+# Provided by Atlas Scientific GitHub: https://github.com/Atlas-Scientific/Raspberry-Pi-sample-code
 
 import io
 import sys

@@ -1,20 +1,20 @@
 #!/bin/bash
+
+#Script written for the purpose of initilising a Raspberry Pi 3B or Pi Zero 2 W to perform automatic and periodic data logging and motor control
+# Written for the University of Cape Town Research Group
+# Written by Joab Gray Kloppers: KLPJOA002
+# Disclaimer: Parts of this code were created with the use of AI tools including: ChatGPT, ClaudeAi
+
+#get the directory of the current location of the script
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+#installing packages required for RTC initilisation
 echo "installing required packages"
 sudo apt install util-linux-extra
 
+#add the required configuration text to the config file to use the DS3231 RTC
 echo "dtoverlay=i2c-rtc,ds3231" | sudo tee -a /boot/firmware/config.txt
 echo "Added DS3231 driver for RTC"
-
-# Force sync mount options for USB mass storage via udev
-#sudo bash -c 'cat > /etc/udev/rules.d/99-usb-sync-mount.rules << EOF
-#ACTION=="add", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", \
-#    ENV{UDISKS_MOUNT_OPTIONS_DEFAULTS}="sync,noatime"
-#EOF'
-
-#sudo udevadm control --reload-rules
-#sudo systemctl restart udisks2
 
 # Create a udev rule that calls a mount helper script on USB block device insertion
 echo Enabling automatic USB Mount
@@ -23,7 +23,7 @@ ACTION=="add",    SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="file
 ACTION=="remove", SUBSYSTEMS=="usb", SUBSYSTEM=="block",                                 RUN+="/usr/local/bin/usb-mount.sh remove %k"
 EOF'
 
-# Create the mount helper script
+# Create the mount helper script: Currently unused 
 sudo bash -c 'cat > /usr/local/bin/usb-mount.sh << '"'"'MOUNTSCRIPT'"'"'
 #!/bin/bash
 # /usr/local/bin/usb-mount.sh
@@ -77,12 +77,14 @@ echo "USB automount configured (no desktop required)"
 
 echo "Setup complete. All USB drives will now be mounted with sync."
 
+#enable I2C interfacing
 echo "Enabling I2C"
 sudo raspi-config nonint do_i2c 0
 
 #echo "Disabling Desktop by switching to console mode"
 #sudo systemctl set-default multi-user.target
 
+#add service and timer to run the logging program every 20 seconds
 echo "Adding system service to run logger"
 sudo tee /etc/systemd/system/logger.service > /dev/null << EOF
 [Unit]

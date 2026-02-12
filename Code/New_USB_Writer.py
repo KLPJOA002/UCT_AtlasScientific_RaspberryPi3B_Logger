@@ -1,3 +1,8 @@
+# Python code written for the purpose of writing sensor data to a present USB drive, and writing a local Backup
+# Written for the University of Cape Town Research Group
+# Written by Joab Gray Kloppers: KLPJOA002
+# Disclaimer: Parts of this code were created with the use of AI tools including: ChatGPT, ClaudeAi
+
 import os
 import time
 from datetime import datetime
@@ -5,8 +10,6 @@ import subprocess
 import re
 
 MOUNT_BASE = "/media/pi"
-CHECK_INTERVAL = 2  # seconds
-
 
 def find_usb_mount():
     """Return path to first mounted USB drive, or None."""
@@ -20,57 +23,14 @@ def find_usb_mount():
 
     return None
 
-
-
-'''
-def find_usb_mount():
-    usb_bases = ["/media/pi", "/media/root", "/media"]
-    with open("/proc/mounts", "r") as f:
-        for line in f:
-            parts = line.split()
-            if len(parts) < 2:
-                continue
-            device, mountpoint = parts[0], parts[1]
-            # Decode octal sequences e.g. \040 -> space
-            mountpoint = re.sub(
-                r'\\0([0-7]{2})',
-                lambda m: chr(int(m.group(1), 8)),
-                mountpoint
-            )
-            if any(mountpoint.startswith(base) for base in usb_bases):
-                return mountpoint
-    return None
-'''
-'''
-def find_usb_mount():
-    """
-    Parse /proc/mounts and return the first mountpoint under MOUNT_BASE.
-    Works in both console and desktop mode, no D-Bus required.
-    """
-    try:
-        with open("/proc/mounts", "r") as f:
-            for line in f:
-                parts = line.split()
-                if len(parts) < 2:
-                    continue
-                mountpoint = parts[1]
-                # Decode octal escape sequences (e.g. \040 -> space)
-                mountpoint = re.sub(
-                    r'\\0([0-7]{2})',
-                    lambda m: chr(int(m.group(1), 8)),
-                    mountpoint
-                )
-                if mountpoint.startswith(MOUNT_BASE):
-                    return mountpoint
-    except Exception as e:
-        print(f"Error reading /proc/mounts: {e}")
-    return None
-'''
 def Write_USB(data,Name_Modifier):
+    #writing the given data to a file modified by the given modifer
+    
     timestamp = datetime.now().strftime("%Y-%m-%d__%H-%M-%S")
     filename = f"data_{Name_Modifier}_{timestamp}.csv"
     
     
+    #write data to a local folder for backup purposes
     try:
         subfolder = os.path.join(os.getcwd(), "Backup_Data")
         os.makedirs(subfolder, exist_ok=True)  # Creates folder if it doesn't exist
@@ -86,24 +46,9 @@ def Write_USB(data,Name_Modifier):
     except Exception as e:
         print("Write failed:", e)
 
+    #detect a usb device for usb writing
     mount = find_usb_mount()
 
-    # USB inserted
-    '''
-    if mount and mount != current_mount:
-        print(f"USB detected at {mount}")
-        current_mount = mount
-
-        try:
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            filename = f"data_{timestamp}.csv"
-            file_path = os.path.join(current_mount, filename)
-            file_handle = open(file_path, "a", buffering=1)
-        except Exception as e:
-            print("Failed to open file:", e)
-            file_handle = None
-
-    '''
     # USB removed
     if not mount:
         print("No USB Media Detected")
