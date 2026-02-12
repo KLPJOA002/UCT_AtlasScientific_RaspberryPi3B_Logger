@@ -67,6 +67,25 @@ def find_usb_mount():
     return None
 '''
 def Write_USB(data,Name_Modifier):
+    timestamp = datetime.now().strftime("%Y-%m-%d__%H-%M-%S")
+    filename = f"data_{Name_Modifier}_{timestamp}.csv"
+    
+    
+    try:
+        subfolder = os.path.join(os.getcwd(), "Backup_Data")
+        os.makedirs(subfolder, exist_ok=True)  # Creates folder if it doesn't exist
+        file_path = os.path.join(subfolder, filename)
+        with open(file_path, "a", buffering=1) as fh:
+        
+            fh.write(data)
+            fh.flush()                   # Flush Python buffer
+            os.fsync(fh.fileno())        # Force OS to write to disk
+        
+        subprocess.run(["sync"], check=True)   # Flush ALL kernel buffers to disk
+        print(f"Written To Local Storage and synced: {filename}")
+    except Exception as e:
+        print("Write failed:", e)
+
     mount = find_usb_mount()
 
     # USB inserted
@@ -92,8 +111,6 @@ def Write_USB(data,Name_Modifier):
 
     # Write data if USB is present
     try:
-        timestamp = datetime.now().strftime("%Y-%m-%d__%H-%M-%S")
-        filename = f"data_{Name_Modifier}_{timestamp}.csv"
         file_path = os.path.join(mount, filename)
         with open(file_path, "a", buffering=1) as fh:
         
@@ -102,9 +119,6 @@ def Write_USB(data,Name_Modifier):
             os.fsync(fh.fileno())        # Force OS to write to disk
         
         subprocess.run(["sync"], check=True)   # Flush ALL kernel buffers to disk
-        print(f"Written and synced: {filename}")
+        print(f"Written to USB Storage and synced: {filename}")
     except Exception as e:
         print("Write failed:", e)
-        #file_handle.close()
-        #file_handle = None
-        #current_mount = None

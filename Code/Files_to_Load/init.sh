@@ -1,23 +1,11 @@
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Ask user for date and time
-echo "Enter current date and time (format: YYYY-MM-DD HH:MM:SS)"
-read USER_DATETIME
+echo "installing required packages"
+sudo apt install util-linux-extra
 
-# Validate basic format (optional, simple regex)
-if [[ ! $USER_DATETIME =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
-    echo "Invalid format. Please use YYYY-MM-DD HH:MM:SS"
-    exit 1
-fi
-
-# Set the system date and time
-sudo date -s "$USER_DATETIME"
-
-# Optional: update hardware clock to persist after reboot
-sudo hwclock -w
-
-echo "System time updated to $USER_DATETIME"
+echo "dtoverlay=i2c-rtc,ds3231" | sudo tee -a /boot/firmware/config.txt
+echo "Added DS3231 driver for RTC"
 
 # Force sync mount options for USB mass storage via udev
 #sudo bash -c 'cat > /etc/udev/rules.d/99-usb-sync-mount.rules << EOF
@@ -118,8 +106,8 @@ Description=Run data logger every minute
 After=local-fs.target sysinit.target
 
 [Timer]
-OnBootSec=30
-OnUnitActiveSec=60
+OnBootSec=60
+OnUnitActiveSec=20
 AccuracySec=1s
 Persistent=true
 Unit=logger.service
@@ -128,9 +116,25 @@ Unit=logger.service
 WantedBy=timers.target
 EOF
 
+#Motor control service
+echo "Adding system service to run motor control"
+sudo tee/etc/systemd/system/MotorControl.service >/dev/null << EOF
+ [Unit]
+ Description=Program to Control the Motor
+ After=multi-user.target
+
+ [Service]
+ Type=idle
+ ExecStart=/usr/bin/python3 $SCRIPT_DIR/Motor_Controller.py 
+
+ [Install]
+ WantedBy=multi-user.target
+EOF
+
 sudo systemctl daemon-reload
 sudo systemctl enable logger.timer
 #sudo systemctl enable logger.service
 sudo systemctl start logger.timer
+sudo systemctl enable MotorCOntrol.service
 
 echo "Setup complete. Please reboot now"

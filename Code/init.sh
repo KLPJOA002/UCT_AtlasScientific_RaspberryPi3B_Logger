@@ -118,7 +118,7 @@ EOF
 
 #Motor control service
 echo "Adding system service to run motor control"
-sudo tee/etc/systemd/system/MotorControl.service >/dev/null << EOF
+sudo tee /etc/systemd/system/MotorControl.service >/dev/null << EOF
  [Unit]
  Description=Program to Control the Motor
  After=multi-user.target
@@ -135,6 +135,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable logger.timer
 #sudo systemctl enable logger.service
 sudo systemctl start logger.timer
-sudo systemctl enable MotorCOntrol.service
+sudo systemctl enable MotorControl.service
 
 echo "Setup complete. Please reboot now"
