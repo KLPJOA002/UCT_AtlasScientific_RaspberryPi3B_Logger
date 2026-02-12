@@ -116,9 +116,25 @@ Unit=logger.service
 WantedBy=timers.target
 EOF
 
+#Motor control service
+echo "Adding system service to run motor control"
+sudo tee/etc/systemd/system/MotorControl.service >/dev/null << EOF
+ [Unit]
+ Description=Program to Control the Motor
+ After=multi-user.target
+
+ [Service]
+ Type=idle
+ ExecStart=/usr/bin/python3 $SCRIPT_DIR/Motor_Controller.py 
+
+ [Install]
+ WantedBy=multi-user.target
+EOF
+
 sudo systemctl daemon-reload
 sudo systemctl enable logger.timer
 #sudo systemctl enable logger.service
 sudo systemctl start logger.timer
+sudo systemctl enable MotorCOntrol.service
 
 echo "Setup complete. Please reboot now"
