@@ -92,7 +92,7 @@ def Write_USB(data,Name_Modifier):
 
     # Write data if USB is present
     try:
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d__%H-%M-%S")
         filename = f"data_{Name_Modifier}_{timestamp}.csv"
         file_path = os.path.join(mount, filename)
         with open(file_path, "a", buffering=1) as fh:

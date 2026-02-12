@@ -107,7 +107,7 @@ After=local-fs.target sysinit.target
 
 [Timer]
 OnBootSec=60
-OnUnitActiveSec=60
+OnUnitActiveSec=20
 AccuracySec=1s
 Persistent=true
 Unit=logger.service
