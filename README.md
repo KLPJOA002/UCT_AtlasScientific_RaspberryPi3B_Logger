@@ -1,13 +1,14 @@
 # Raspberry Pi based Atlas Scientific Sensor Logger #
----
+
 Python Code and OS initilisation to configure a Raspberry Pi 3 B or Raspberry Pi Zero 2 W to periodically log sensor data from an Atlas Scientific i4 interLink connected to two Industrial DO/RTD Sensors.
 
 This configures I2C communication with a DS3231 RTC and Relavent Atlas Scientific embedded circuits.
 This configuration has been designed for the use of two industrial DO/RTD sensors connected onto an Atlas Scientific i4 inter Link carrier board.
+
 ---
 
 ## Sensor Configuration ##
-The Industrial DO/RTD sensor connetects directly to the i4 interLink carrier board using the pre installed SMA connectors. Each sensor requires two EZO^TM^ Circuits to read the sensor data and provide interfacing. One circuit (EZO™ Dissolved Oxygen Circuit) reads dissolved oxygen probe, and another circuit (EZO™ RTD Temperature Circuit) reads the temperature probe.
+The Industrial DO/RTD sensor connetects directly to the i4 interLink carrier board using the pre installed SMA connectors. Each sensor requires two EZO<sup>TM</sup> Circuits to read the sensor data and provide interfacing. One circuit (EZO™ Dissolved Oxygen Circuit) reads dissolved oxygen probe, and another circuit (EZO™ RTD Temperature Circuit) reads the temperature probe.
 ![alt text](AtlasScientific_i4interLink_Connected.jpg)
 
 By default the EZO^TM^ circuits operate in UART communication mode and so need to be manually configured to operate in I2C communication mode. 
