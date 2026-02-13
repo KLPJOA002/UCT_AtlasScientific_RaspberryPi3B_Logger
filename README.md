@@ -69,6 +69,7 @@ In order to change the I2C address of the RTD board, the following procedure nee
 The raspberry Pi needs to be configured to use the I2C interface, automatically run the logging program, and update and install drivers to use the real time clock. This is all performed by the two scripts init.sh and time_init.sh.
 
 In order to connect the Raspberry Pi to the sensors and real time clock, the following connections must be made:
+![alt text](Pi_GPIO.png)
 ### Pi setup for Sensor configuration ###
 1. 
 
