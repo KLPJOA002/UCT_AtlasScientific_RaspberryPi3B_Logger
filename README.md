@@ -8,11 +8,10 @@ This configuration has been designed for the use of two industrial DO/RTD sensor
 ---
 
 ## Sensor Configuration ##
-<<<<<<< HEAD
-The Industrial DO/RTD sensor connetects directly to the i4 interLink carrier board using the pre installed SMA connectors. Each sensor requires two EZO ^TM^ Circuits to read the sensor data and provide interfacing. One circuit (EZO™ Dissolved Oxygen Circuit) reads dissolved oxygen probe, and another circuit (EZO™ RTD Temperature Circuit) reads the temperature probe.
-=======
+The Industrial DO/RTD sensor connetects directly to the i4 interLink carrier board using the pre installed SMA connectors. Each sensor requires two EZO <sup>TM</sup> Circuits to read the sensor data and provide interfacing. One circuit (EZO™ Dissolved Oxygen Circuit) reads dissolved oxygen probe, and another circuit (EZO™ RTD Temperature Circuit) reads the temperature probe.
+
 The Industrial DO/RTD sensor connetects directly to the i4 interLink carrier board using the pre installed SMA connectors. Each sensor requires two EZO<sup>TM</sup> Circuits to read the sensor data and provide interfacing. One circuit (EZO™ Dissolved Oxygen Circuit) reads dissolved oxygen probe, and another circuit (EZO™ RTD Temperature Circuit) reads the temperature probe.
->>>>>>> b6c2e5661311ba8790f92331ff2376bceec0db70
+
 ![alt text](AtlasScientific_i4interLink_Connected.jpg)
 
 By default the EZO<sup>TM</sup> circuits operate in UART communication mode and so need to be manually configured to operate in I2C communication mode. 
@@ -30,6 +29,7 @@ In order to configure the disolved oxygen circuit to communicate with the I2C pr
 4. Wait for the board LED to change from solid green to solid blue
 5. You can now disconnect the VCC and GND Pins, then disconnect the TX and PGND pin.
 6. The board is now ready for I2C Communication
+
 ![alt text](DO_I2CMode-1.jpg)
 
 In order to change the I2C address of the DO board, the following procedure needs to be taken:
@@ -52,6 +52,7 @@ In order to configure the RTD temperature circuit to communicate with the I2C pr
 4. Wait for the board LED to change from solid green to solid blue
 5. You can now disconnect the VCC and GND Pins, then disconnect the TX and PRB pin.
 6. The board is now ready for I2C Communication
+
 ![alt text](RTD_I2CMode-1.jpg)
 
 In order to change the I2C address of the RTD board, the following procedure needs to be taken:
@@ -66,13 +67,13 @@ In order to change the I2C address of the RTD board, the following procedure nee
 
 ---
 ## Raspberry Pi Configuration ##
+![alt text](PI_GPIO.jpg)
+
+The image above illustrates the Pin functions on the Raspberry Pi GPIO header. The diagram is orientated such that the GPIO header is on the right hand side of the board, with the USB ports facing towards you.
+
 The raspberry Pi needs to be configured to use the I2C interface, automatically run the logging program, and update and install drivers to use the real time clock. This is all performed by the two scripts init.sh and time_init.sh.
 
-In order to connect the Raspberry Pi to the sensors and real time clock, the following connections must be made:
-![alt text](Pi_GPIO.png)
-### Pi setup for Sensor configuration ###
-1. 
-
+In order to connect the Raspberry Pi to the sensors and real time clock, the following connections must be made
 ### Raspberry Pi 3 B ###
 1. Orient the board with the board with the USB ports directed towards you, and the pin headers on the right side.
 2. Pin 1 (Top left pin) on the pin header is used to supply VCC (3.3V) to all conencted devices. Pin 3 (Directly Below Pin 1) is used for the SDA connection. Pin 5 is used for the SCL connection. Pin 6 is used for the GND or ground connection.
@@ -83,6 +84,9 @@ In order to connect the Raspberry Pi to the sensors and real time clock, the fol
 
 ### Raspberry Pi Zero 2 W ###
 The connections for the Pi Zero 2 W are the same as for the Pi 3B. Ensure the Pin Header is on the right side of the board.
+
+
+### Pi setup for Sensor configuration ###
 1. Using the Raspberry Pi Imager (https://www.raspberrypi.com/software/), Flash an SD Card with Raspberry Pi OS (32-bit) for the Raspberry Pi 3B (this will work with the Pi Zero 2W aswell)
 2. Follow the onscreen instructions and use the following configuration: Hostname: "pi". Default Time zone configuration. Username: "pi", use a password of you choosing but keep note. Configure the wifi settings to conenct to your local wifi or hotspot. Enable SSH. Disable Pi Conenct.
 3. Once the SD Card has finished flashing, it can be inserted into the Raspberry Pi.
@@ -109,7 +113,12 @@ In order to correctly configure the Raspberry Pi with the relavent software, the
 9. Enter the following command 'sudo reboot'
 10. Wait for the Raspberry Pi to reboot. 
 11. Once Rebooted the system will automatically begin data logging and perform motor control.
-12. In order to initilise the RTC to have the correct time, the following command can be run in a terminal located in the Files_to_Load folder.
+#### Optional RTC Configuration ####
+13. In order to initilise the RTC to have the correct time, the following command can be run in a terminal located in the Files_to_Load folder.
 'bash Time_Init.sh'
-13. Follow the on screen instructions. This time initilisation process only needs to be performed if the RTC has not already been configured, and only needs to be run once.
-14. The Pi is now set up and can be disconnected from power (Disconnect power only when the Sensors are not being read, this can be seen when the sensor LED's are not flashing). To perform the experiment, Connect power to the Pi and optionally connect a USB drive to the board. The system will automatically log sensor data every 20 seconds and store the files both locally and to the connected USB drive. When removing the USB drive, wait for a few seconds after a sensor read has been performed (once the sensor LED's turn off) then remove the USB.
+14. Follow the on screen instructions. This time initilisation process only needs to be performed if the RTC has not already been configured, and only needs to be run once.
+15. The Pi is now set up and can be disconnected from power (Disconnect power only when the Sensors are not being read, this can be seen when the sensor LED's are not flashing). To perform the experiment, Connect power to the Pi and optionally connect a USB drive to the board. The system will automatically log sensor data every 20 seconds and store the files both locally and to the connected USB drive. When removing the USB drive, wait for a few seconds after a sensor read has been performed (once the sensor LED's turn off) then remove the USB.
+
+### SD Card Clone ###
+Once an sd card has been correctly confifured using the included code, this sd card can be cloned onto any other number of sd cards and each will function identically to the working one. This makes it easy to duplicate a functioning system.
+This can be done usin g avalible software used for cloning drives/flashing operating systems such as balenaEtcher. Simply select the source for the flashing process as the functioning card, then select the destination to be a fresh sd card. Then proceeed with the flashing process.
