@@ -11,9 +11,9 @@ This configuration has been designed for the use of two industrial DO/RTD sensor
 The Industrial DO/RTD sensor connetects directly to the i4 interLink carrier board using the pre installed SMA connectors. Each sensor requires two EZO<sup>TM</sup> Circuits to read the sensor data and provide interfacing. One circuit (EZO™ Dissolved Oxygen Circuit) reads dissolved oxygen probe, and another circuit (EZO™ RTD Temperature Circuit) reads the temperature probe.
 ![alt text](AtlasScientific_i4interLink_Connected.jpg)
 
-By default the EZO^TM^ circuits operate in UART communication mode and so need to be manually configured to operate in I2C communication mode. 
+By default the EZO<sup>TM</sup> circuits operate in UART communication mode and so need to be manually configured to operate in I2C communication mode. 
 
-Additionally the circuits come pre-programed with preprogramed I2C addresses which are the same accross the type of cicuit. So two connected DO circuits will have the same I2C addresses. This can be changed through the I2C communication interface, and so needs to be done before two industrial sensors are conencted to the same carrier board. Therefore one DO board and one RTD board per i4 carrier board needs to be configured with a differnt I2C address.
+Additionally the circuits come pre-programed with set I2C addresses which are identical accross the same type of cicuit. So two connected DO circuits will have the same I2C addresses. This can be changed through the I2C communication interface, and so needs to be done before two industrial sensors are conencted to the same carrier board. Therefore one DO board and one RTD board per i4 carrier board needs to be configured with a differnt I2C address.
 
 Instructions for this process is instructed here, however it is important to note that these instructions may become outdated.
 
@@ -30,8 +30,8 @@ In order to configure the disolved oxygen circuit to communicate with the I2C pr
 
 In order to change the I2C address of the DO board, the following procedure needs to be taken:
 1. Connect one of the DO circuits to the i4 carrier board 
-2. Connect a configured Raspberry pi board to the relavent VCC, GND, SDA and SCL pins (How this connection is explained later). 
-3. Through the terminal interface located in the same directory as the included AtlasI2C.py and i2c.py files, run the following command:
+2. Connect a configured Raspberry pi board to the relavent VCC, GND, SDA and SCL pins (This is explained in the Pi setup section). 
+3. Through a terminal interface located in the same directory as the included AtlasI2C.py and i2c.py files, run the following command:
 'sudo python i2c.py'
 4. If the boards are connected correctly, text inteface listing commands should apear on the terminal.
 5. Enter the command '97: I2C,98' This instructs the circuit to change its I2C address to 98 or 0x62 to prevent clashing with the second circuit. (The programmed address 98 can b altered to any other address that does not conflict with connected devices, however the accompanying AutomatedLogger.py code needs to be altered to use this address. By default the logger code uses the addresses 97, 98 for the two DO sensors and 102, 103 for the two RTD sensors)
